@@ -1981,106 +1981,111 @@ Replication Tasks
 -----------------
 
 *Replication* is the duplication of snapshots from one %brand% system
-to another computer. When a new snapshot is created on the source
-computer, it is automatically replicated to the destination computer.
-Replication is typically used to keep a copy of files on a separate
-system, with that system sometimes being at a different physical
-location.
-
-The basic configuration requires a source system with the original
-data and a destination system where the data will be replicated. When a
-:ref:`periodic snapshot <Periodic Snapshot Tasks>` of the selected
-dataset occurs, the replication task copies the data to the destination
+to another computer. Replication is typically used to keep a copy of
+files on a separate system, with that system sometimes being at a
+different physical location. When properly configured, active
+replications copy new snapshots from the source system to a destination
 system.
 
-When snapshots are automatically created on the source computer, they
-are replicated to the destination computer. First-time replication tasks
-can take a long time to complete as the entire snapshot must be copied
-to the destination system. Replicated data is not visible on the
-receiving system until the replication task completes. Later
-replications only send the snapshot changes to the destination system.
-Interrupting a running replication requires the replication task to
-restart from the beginning.
+The basic configuration requires a source system with the original
+data, a destination system that will store copied data, and an
+:ref:`SSH Connection <SSH Connections>` to establish the link between
+both systems. When an active
+:ref:`periodic snapshot <Periodic Snapshot Tasks>` schedule takes
+snapshots of a source system dataset, the replication task copies the
+data to the destination system.
+
+First-time replication tasks can take a long time to complete as the
+entire dataset snapshot must be copied to the destination system.
+Replicated data is not visible on the receiving system until the
+replication task is complete.
 
 The target dataset on the receiving system is automatically created in
 read-only mode to protect the data. To mount or browse the data on the
-receiving system, create a clone of the snapshot and use the clone.
-Clones are created in read/write mode, making it possible to browse or
-mount them. See :ref:`Snapshots` for more information on creating clones.
+receiving system, use a clone of the snapshot. Clones are created in
+read/write mode, making it possible to browse or mount them. See
+:ref:`Snapshots` for more details.
 
 
-.. _replication_common_config:
+.. _Add Replication:
 
-Examples: Common Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The examples shown here use the same setup of source and destination
-computers.
+Add Replication
+~~~~~~~~~~~~~~~
 
 
-*Alpha* (Source)
-^^^^^^^^^^^^^^^^
+.. REVIEW and/or DELETE everything added to the comment VVVV
+ .. _replication_common_config:
 
-*Alpha* is the source computer with the data to be replicated. It is
-at IP address *10.0.0.102*. A :ref:`volume <Volumes>` named *alphavol*
-has already been created, and a :ref:`dataset <Create Dataset>` named
-*alphadata* has been created on that volume. This dataset contains the
-files which will be snapshotted and replicated onto *Beta*.
+ Examples: Common Configuration
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This new dataset has been created for this example, but a new dataset
-is not required. Most users will already have datasets containing the
-data they wish to replicate.
-
-Create a periodic snapshot of the source dataset by selecting
-:menuselection:`Storage --> Periodic Snapshot Tasks`.
-Click the *alphavol/alphadata* dataset to highlight it. Create a
-:ref:`periodic snapshot <Periodic Snapshot Tasks>` of it by clicking
-:guilabel:`Periodic Snapshot Tasks`, then
-:guilabel:`Add Periodic Snapshot` as shown in
-:numref:`Figure %s <zfs_create_periodic_replication_fig>`.
-
-This example creates a snapshot of the *alphavol/alphadata* dataset
-every two hours from Monday through Friday between the hours of 9:00
-and 18:00 (6:00 PM). Snapshots are automatically deleted after their
-chosen lifetime of two weeks expires.
+ The examples shown here use the same setup of source and destination
+ computers.
 
 
-.. _zfs_create_periodic_replication_fig:
+ *Alpha* (Source)
+ ^^^^^^^^^^^^^^^^
 
-.. figure:: images/replication3a.png
+ *Alpha* is the source computer with the data to be replicated. It is
+ at IP address *10.0.0.102*. A :ref:`volume <Volumes>` named *alphavol*
+ has already been created, and a :ref:`dataset <Create Dataset>` named
+ *alphadata* has been created on that volume. This dataset contains the
+ files which will be snapshotted and replicated onto *Beta*.
+
+ This new dataset has been created for this example, but a new dataset
+ is not required. Most users will already have datasets containing the
+ data they wish to replicate.
+
+ Create a periodic snapshot of the source dataset by selecting
+ :menuselection:`Storage --> Periodic Snapshot Tasks`.
+ Click the *alphavol/alphadata* dataset to highlight it. Create a
+ :ref:`periodic snapshot <Periodic Snapshot Tasks>` of it by clicking
+ :guilabel:`Periodic Snapshot Tasks`, then
+ :guilabel:`Add Periodic Snapshot` as shown in
+ :numref:`Figure %s <zfs_create_periodic_replication_fig>`.
+
+ This example creates a snapshot of the *alphavol/alphadata* dataset
+ every two hours from Monday through Friday between the hours of 9:00
+ and 18:00 (6:00 PM). Snapshots are automatically deleted after their
+ chosen lifetime of two weeks expires.
+
+
+ .. _zfs_create_periodic_replication_fig:
+
+ .. figure:: images/replication3a.png
 
    Create a Periodic Snapshot for Replication
 
 
-*Beta* (Destination)
-^^^^^^^^^^^^^^^^^^^^
+ *Beta* (Destination)
+ ^^^^^^^^^^^^^^^^^^^^
 
-*Beta* is the destination computer where the replicated data will be
-copied.  It is at IP address *10.0.0.118*. A :ref:`volume <Volumes>`
-named *betavol* has already been created.
+ *Beta* is the destination computer where the replicated data will be
+ copied.  It is at IP address *10.0.0.118*. A :ref:`volume <Volumes>`
+ named *betavol* has already been created.
 
-Snapshots are transferred with :ref:`SSH`. To allow incoming
-connections, this service is enabled on *Beta*. The service is not
-required for outgoing connections, and so does not need to be enabled
-on *Alpha*.
+ Snapshots are transferred with :ref:`SSH`. To allow incoming
+ connections, this service is enabled on *Beta*. The service is not
+ required for outgoing connections, and so does not need to be enabled
+ on *Alpha*.
 
 
-Example: %brand% to %brand% Semi-Automatic Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Example: %brand% to %brand% Semi-Automatic Setup
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%brand% offers a special semi-automatic setup mode that simplifies
-setting up replication.  Create the replication task on *Alpha* by
-clicking :guilabel:`Replication Tasks` and
-:guilabel:`Add Replication`. *alphavol/alphadata* is selected as the
-dataset to replicate. *betavol* is the destination volume where
-*alphadata* snapshots are replicated. The :guilabel:`Setup mode`
-dropdown is set to *Semi-automatic* as shown in
-:numref:`Figure %s <zfs_create_repl2_fig>`.
-The IP address of *Beta* is entered in the :guilabel:`Remote hostname`
-field. A hostname can be entered here if local DNS resolves for that
-hostname.
+ %brand% offers a special semi-automatic setup mode that simplifies
+ setting up replication.  Create the replication task on *Alpha* by
+ clicking :guilabel:`Replication Tasks` and
+ :guilabel:`Add Replication`. *alphavol/alphadata* is selected as the
+ dataset to replicate. *betavol* is the destination volume where
+ *alphadata* snapshots are replicated. The :guilabel:`Setup mode`
+ dropdown is set to *Semi-automatic* as shown in
+ :numref:`Figure %s <zfs_create_repl2_fig>`.
+ The IP address of *Beta* is entered in the :guilabel:`Remote hostname`
+ field. A hostname can be entered here if local DNS resolves for that
+ hostname.
 
-.. note:: If :guilabel:`WebGUI HTTP --> HTTPS Redirect` has been
+ .. note:: If :guilabel:`WebGUI HTTP --> HTTPS Redirect` has been
    enabled in
    :menuselection:`System --> General`
    on the destination computer,
@@ -2089,150 +2094,150 @@ hostname.
    creating the replication on the source computer.
 
 
-.. _zfs_create_repl2_fig:
+ .. _zfs_create_repl2_fig:
 
-.. figure:: images/replication6.png
+ .. figure:: images/replication6.png
 
    Add Replication Dialog, Semi-Automatic
 
 
-The :guilabel:`Remote Auth Token` field expects a special token from
-the *Beta* computer. On *Beta*, choose
-:menuselection:`Storage --> Replication Tasks`,
-then click :guilabel:`Temporary Auth Token`. A dialog showing the
-temporary authorization token is shown as in
-:numref:`Figure %s <zfs_auth_token_fig>`.
+ The :guilabel:`Remote Auth Token` field expects a special token from
+ the *Beta* computer. On *Beta*, choose
+ :menuselection:`Storage --> Replication Tasks`,
+ then click :guilabel:`Temporary Auth Token`. A dialog showing the
+ temporary authorization token is shown as in
+ :numref:`Figure %s <zfs_auth_token_fig>`.
 
-Highlight the temporary authorization token string with the mouse and
-copy it.
+ Highlight the temporary authorization token string with the mouse and
+ copy it.
 
 
-.. _zfs_auth_token_fig:
+ .. _zfs_auth_token_fig:
 
-.. figure:: images/replication7.png
+ .. figure:: images/replication7.png
 
    Temporary Authentication Token on Destination
 
 
-On the *Alpha* system, paste the copied temporary authorization token
-string into the :guilabel:`Remote Auth Token` field as shown in
-:numref:`Figure %s <zfs_auth_token_paste_fig>`.
+ On the *Alpha* system, paste the copied temporary authorization token
+ string into the :guilabel:`Remote Auth Token` field as shown in
+ :numref:`Figure %s <zfs_auth_token_paste_fig>`.
 
 
-.. _zfs_auth_token_paste_fig:
+ .. _zfs_auth_token_paste_fig:
 
-.. figure:: images/replication8.png
+ .. figure:: images/replication8.png
 
    Temporary Authentication Token Pasted to Source
 
 
-Finally, click the :guilabel:`OK` button to create the replication
-task. After each periodic snapshot is created, a replication task will
-copy it to the destination system. See
-:ref:`Limiting Replication Times` for information about restricting
-when replication is allowed to run.
+ Finally, click the :guilabel:`OK` button to create the replication
+ task. After each periodic snapshot is created, a replication task will
+ copy it to the destination system. See
+ :ref:`Limiting Replication Times` for information about restricting
+ when replication is allowed to run.
 
-.. note::  The temporary authorization token is only valid for a few
+ .. note::  The temporary authorization token is only valid for a few
    minutes. If a *Token is invalid* message is shown, get a new
    temporary authorization token from the destination system, clear
    the :guilabel:`Remote Auth Token` field, and paste in the new one.
 
 
-Example: %brand% to %brand% Dedicated User Replication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Example: %brand% to %brand% Dedicated User Replication
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A *dedicated user* can be used for replications rather than the root
-user. This example shows the process using the semi-automatic
-replication setup between two %brand% systems with a dedicated user
-named *repluser*. SSH key authentication is used to allow the user to
-log in remotely without a password.
+ A *dedicated user* can be used for replications rather than the root
+ user. This example shows the process using the semi-automatic
+ replication setup between two %brand% systems with a dedicated user
+ named *repluser*. SSH key authentication is used to allow the user to
+ log in remotely without a password.
 
-In this example, the periodic snapshot task has not been created yet.
-If the periodic snapshot shown in the
-:ref:`example configuration <replication_common_config>` has already
-been created, go to
-:menuselection:`Storage --> Periodic Snapshot Tasks`,
-click on the task to select it, and click :guilabel:`Delete` to remove
-it before continuing.
+ In this example, the periodic snapshot task has not been created yet.
+ If the periodic snapshot shown in the
+ :ref:`example configuration <replication_common_config>` has already
+ been created, go to
+ :menuselection:`Storage --> Periodic Snapshot Tasks`,
+ click on the task to select it, and click :guilabel:`Delete` to remove
+ it before continuing.
 
-On *Alpha*, select
-:menuselection:`Account --> Users`.
-Click the :guilabel:`Add User`. Enter *repluser* for
-:guilabel:`Username`, enter */mnt/alphavol/repluser* in the
-:guilabel:`Create Home Directory In` field, enter
-*Replication Dedicated User* for the :guilabel:`Full Name`, and set
-the :guilabel:`Disable password login` option. Leave the other
-fields at their default values, but note the :guilabel:`User ID`
-number. Click :guilabel:`OK` to create the user.
+ On *Alpha*, select
+ :menuselection:`Account --> Users`.
+ Click the :guilabel:`Add User`. Enter *repluser* for
+ :guilabel:`Username`, enter */mnt/alphavol/repluser* in the
+ :guilabel:`Create Home Directory In` field, enter
+ *Replication Dedicated User* for the :guilabel:`Full Name`, and set
+ the :guilabel:`Disable password login` option. Leave the other
+ fields at their default values, but note the :guilabel:`User ID`
+ number. Click :guilabel:`OK` to create the user.
 
-On *Beta*, the same dedicated user must be created as was created on
-the sending computer. Select
-:menuselection:`Account --> Users`.
-Click the :guilabel:`Add User`. Enter the *User ID* number from
-*Alpha*, *repluser* for :guilabel:`Username`, enter
-*/mnt/betavol/repluser* in the :guilabel:`Create Home Directory In`
-field, enter *Replication Dedicated User* for the
-:guilabel:`Full Name`, and set the :guilabel:`Disable password login`
-option. Leave the other fields at their default values. Click
-:guilabel:`OK` to create the user.
+ On *Beta*, the same dedicated user must be created as was created on
+ the sending computer. Select
+ :menuselection:`Account --> Users`.
+ Click the :guilabel:`Add User`. Enter the *User ID* number from
+ *Alpha*, *repluser* for :guilabel:`Username`, enter
+ */mnt/betavol/repluser* in the :guilabel:`Create Home Directory In`
+ field, enter *Replication Dedicated User* for the
+ :guilabel:`Full Name`, and set the :guilabel:`Disable password login`
+ option. Leave the other fields at their default values. Click
+ :guilabel:`OK` to create the user.
 
-A dataset with the same name as the original must be created on the
-destination computer, *Beta*. Select
-:menuselection:`Storage --> Volumes`,
-click on *betavol*, then click the :guilabel:`Create Dataset` icon at
-the bottom. Enter *alphadata* as the :guilabel:`Dataset Name`, then
-click :guilabel:`Add Dataset`.
+ A dataset with the same name as the original must be created on the
+ destination computer, *Beta*. Select
+ :menuselection:`Storage --> Volumes`,
+ click on *betavol*, then click the :guilabel:`Create Dataset` icon at
+ the bottom. Enter *alphadata* as the :guilabel:`Dataset Name`, then
+ click :guilabel:`Add Dataset`.
 
-The replication user must be given permissions to the destination
-dataset. Still on *Beta*, open a :ref:`Shell` and enter this command:
+ The replication user must be given permissions to the destination
+ dataset. Still on *Beta*, open a :ref:`Shell` and enter this command:
 
-.. code-block:: none
+ .. code-block:: none
 
    zfs allow -ldu repluser create,destroy,diff,mount,readonly,receive,release,send,userprop betavol/alphadata
 
 
-The destination dataset must also be set to read-only. Enter this
-command in the :ref:`Shell`:
+ The destination dataset must also be set to read-only. Enter this
+ command in the :ref:`Shell`:
 
-.. code-block:: none
+ .. code-block:: none
 
    zfs set readonly=on betavol/alphadata
 
 
-Close the :ref:`Shell` by typing :command:`exit` and pressing
-:kbd:`Enter`.
+ Close the :ref:`Shell` by typing :command:`exit` and pressing
+ :kbd:`Enter`.
 
-The replication user must also be able to mount datasets. Still on
-*Beta*, go to
-:menuselection:`System --> Tunables`.
-Click :guilabel:`Add Tunable`. Enter *vfs.usermount* for the
-:guilabel:`Variable`, *1* for the :guilabel:`Value`, and choose
-*Sysctl* from the :guilabel:`Type` drop-down. Click :guilabel:`OK` to
-save the tunable settings.
+ The replication user must also be able to mount datasets. Still on
+ *Beta*, go to
+ :menuselection:`System --> Tunables`.
+ Click :guilabel:`Add Tunable`. Enter *vfs.usermount* for the
+ :guilabel:`Variable`, *1* for the :guilabel:`Value`, and choose
+ *Sysctl* from the :guilabel:`Type` drop-down. Click :guilabel:`OK` to
+ save the tunable settings.
 
-Back on *Alpha*, create a periodic snapshot of the source dataset by
-selecting
-:menuselection:`Storage --> Periodic Snapshot Tasks`.
-Click the *alphavol/alphadata* dataset to highlight it. Create a
-:ref:`periodic snapshot <Periodic Snapshot Tasks>` of it by clicking
-:guilabel:`Periodic Snapshot Tasks`, then
-:guilabel:`Add Periodic Snapshot` as shown in
-:numref:`Figure %s <zfs_create_periodic_replication_fig>`.
+ Back on *Alpha*, create a periodic snapshot of the source dataset by
+ selecting
+ :menuselection:`Storage --> Periodic Snapshot Tasks`.
+ Click the *alphavol/alphadata* dataset to highlight it. Create a
+ :ref:`periodic snapshot <Periodic Snapshot Tasks>` of it by clicking
+ :guilabel:`Periodic Snapshot Tasks`, then
+ :guilabel:`Add Periodic Snapshot` as shown in
+ :numref:`Figure %s <zfs_create_periodic_replication_fig>`.
 
-Still on *Alpha*, create the replication task by clicking
-:guilabel:`Replication Tasks` and :guilabel:`Add Replication`.
-*alphavol/alphadata* is selected as the dataset to replicate.
-*betavol/alphadata* is the destination volume and dataset where
-*alphadata* snapshots are replicated.
+ Still on *Alpha*, create the replication task by clicking
+ :guilabel:`Replication Tasks` and :guilabel:`Add Replication`.
+ *alphavol/alphadata* is selected as the dataset to replicate.
+ *betavol/alphadata* is the destination volume and dataset where
+ *alphadata* snapshots are replicated.
 
-The :guilabel:`Setup mode` dropdown is set to *Semi-automatic* as
-shown in
-:numref:`Figure %s <zfs_create_repl2_fig>`.
-The IP address of *Beta* is entered in the :guilabel:`Remote hostname`
-field. A hostname can be entered here if local DNS resolves for that
-hostname.
+ The :guilabel:`Setup mode` dropdown is set to *Semi-automatic* as
+ shown in
+ :numref:`Figure %s <zfs_create_repl2_fig>`.
+ The IP address of *Beta* is entered in the :guilabel:`Remote hostname`
+ field. A hostname can be entered here if local DNS resolves for that
+ hostname.
 
-.. note:: If :guilabel:`WebGUI HTTP --> HTTPS Redirect` has been
+ .. note:: If :guilabel:`WebGUI HTTP --> HTTPS Redirect` has been
    enabled in
    :menuselection:`System --> General`
    on the destination computer,
@@ -2241,114 +2246,114 @@ hostname.
    creating the replication on the source computer.
 
 
-The :guilabel:`Remote Auth Token` field expects a special token from
-the *Beta* computer. On *Beta*, choose
-:menuselection:`Storage --> Replication Tasks`,
-then click :guilabel:`Temporary Auth Token`. A dialog showing the
-temporary authorization token is shown as in
-:numref:`Figure %s <zfs_auth_token_fig>`.
+ The :guilabel:`Remote Auth Token` field expects a special token from
+ the *Beta* computer. On *Beta*, choose
+ :menuselection:`Storage --> Replication Tasks`,
+ then click :guilabel:`Temporary Auth Token`. A dialog showing the
+ temporary authorization token is shown as in
+ :numref:`Figure %s <zfs_auth_token_fig>`.
 
-Highlight the temporary authorization token string with the mouse and
-copy it.
+ Highlight the temporary authorization token string with the mouse and
+ copy it.
 
-On the *Alpha* system, paste the copied temporary authorization token
-string into the :guilabel:`Remote Auth Token` field as shown in
-:numref:`Figure %s <zfs_auth_token_paste_fig>`.
+ On the *Alpha* system, paste the copied temporary authorization token
+ string into the :guilabel:`Remote Auth Token` field as shown in
+ :numref:`Figure %s <zfs_auth_token_paste_fig>`.
 
-Set the :guilabel:`Dedicated User` option. Choose *repluser* in the
-:guilabel:`Dedicated User` drop-down.
+ Set the :guilabel:`Dedicated User` option. Choose *repluser* in the
+ :guilabel:`Dedicated User` drop-down.
 
-Click the :guilabel:`OK` button to create the replication task.
+ Click the :guilabel:`OK` button to create the replication task.
 
 
-.. note::  The temporary authorization token is only valid for a few
+ .. note::  The temporary authorization token is only valid for a few
    minutes. If a *Token is invalid* message is shown, get a new
    temporary authorization token from the destination system, clear
    the :guilabel:`Remote Auth Token` field, and paste in the new one.
 
 
-#ifdef comment
-Still on *Alpha*, click on the :guilabel:`View Public Key` button at
-the top of the :guilabel:`Replication Tasks` screen. Copy the key
-value with the mouse.
+ #ifdef comment
+ Still on *Alpha*, click on the :guilabel:`View Public Key` button at
+ the top of the :guilabel:`Replication Tasks` screen. Copy the key
+ value with the mouse.
 
-This might not be necessary with semi-auto replication
-On *Beta*, select
-:menuselection:`Account --> Users`. Click the *repluser* line to
-select it, then click :guilabel:`Modify User`. Paste the value in the
-:guilabel:`SSH Public Key` field. (overwrite existing if present?)\
-#endif comment
+ This might not be necessary with semi-auto replication
+ On *Beta*, select
+ :menuselection:`Account --> Users`. Click the *repluser* line to
+ select it, then click :guilabel:`Modify User`. Paste the value in the
+ :guilabel:`SSH Public Key` field. (overwrite existing if present?)\
+ #endif comment
 
-Replication will begin when the periodic snapshot task runs.
+ Replication will begin when the periodic snapshot task runs.
 
-Additional replications can use the same dedicated user that has
-already been set up. The permissions and read only settings made
-through the :ref:`Shell` must be set on each new destination dataset.
-
-
-Example: %brand% to %brand% or Other Systems, Manual Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This example uses the same basic configuration of source and
-destination computers shown above, but the destination computer is not
-required to be a %brand% system. Other operating systems can receive
-the replication if they support SSH, ZFS, and the same features that
-are in use on the source system. The details of creating volumes and
-datasets, enabling SSH, and copying encryption keys will vary when the
-destination computer is not a %brand% system.
+ Additional replications can use the same dedicated user that has
+ already been set up. The permissions and read only settings made
+ through the :ref:`Shell` must be set on each new destination dataset.
 
 
-Encryption Keys
-^^^^^^^^^^^^^^^
+ Example: %brand% to %brand% or Other Systems, Manual Setup
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A public encryption key must be copied from *Alpha* to *Beta* to
-allow a secure connection without a password prompt. On *Alpha*,
-select
-:menuselection:`Storage --> Replication Tasks --> View Public Key`,
-producing the window shown in
-:numref:`Figure %s <zfs_copy_replication_key_fig>`.
-Use the mouse to highlight the key data shown in the window, then copy
-it.
+ This example uses the same basic configuration of source and
+ destination computers shown above, but the destination computer is not
+ required to be a %brand% system. Other operating systems can receive
+ the replication if they support SSH, ZFS, and the same features that
+ are in use on the source system. The details of creating volumes and
+ datasets, enabling SSH, and copying encryption keys will vary when the
+ destination computer is not a %brand% system.
 
 
-.. _zfs_copy_replication_key_fig:
+ Encryption Keys
+ ^^^^^^^^^^^^^^^
 
-.. figure:: images/replication1c.png
+ A public encryption key must be copied from *Alpha* to *Beta* to
+ allow a secure connection without a password prompt. On *Alpha*,
+ select
+ :menuselection:`Storage --> Replication Tasks --> View Public Key`,
+ producing the window shown in
+ :numref:`Figure %s <zfs_copy_replication_key_fig>`.
+ Use the mouse to highlight the key data shown in the window, then copy
+ it.
+
+
+ .. _zfs_copy_replication_key_fig:
+
+ .. figure:: images/replication1c.png
 
    Copy the Replication Key
 
 
-On *Beta*, select
-:menuselection:`Account --> Users --> View Users`. Click the *root*
-account to select it, then click :guilabel:`Modify User`. Paste the
-copied key into the :guilabel:`SSH Public Key` field and click
-:guilabel:`OK` as shown in
-:numref:`Figure %s <zfs_paste_replication_key_fig>`.
+ On *Beta*, select
+ :menuselection:`Account --> Users --> View Users`. Click the *root*
+ account to select it, then click :guilabel:`Modify User`. Paste the
+ copied key into the :guilabel:`SSH Public Key` field and click
+ :guilabel:`OK` as shown in
+ :numref:`Figure %s <zfs_paste_replication_key_fig>`.
 
 
-.. _zfs_paste_replication_key_fig:
+ .. _zfs_paste_replication_key_fig:
 
-.. figure:: images/replication4.png
+ .. figure:: images/replication4.png
 
    Paste the Replication Key
 
 
-Back on *Alpha*, create the replication task by clicking
-:guilabel:`Replication Tasks` and :guilabel:`Add Replication`.
-*alphavol/alphadata* is selected as the dataset to replicate. The
-destination volume is *betavol*. The *alphadata* dataset and snapshots
-are replicated there. The IP address of *Beta* is entered in the
-:guilabel:`Remote hostname` field as shown in
-:numref:`Figure %s <zfs_create_repl1_fig>`.
-A hostname can be entered here if local DNS resolves for that
-hostname.
+ Back on *Alpha*, create the replication task by clicking
+ :guilabel:`Replication Tasks` and :guilabel:`Add Replication`.
+ *alphavol/alphadata* is selected as the dataset to replicate. The
+ destination volume is *betavol*. The *alphadata* dataset and snapshots
+ are replicated there. The IP address of *Beta* is entered in the
+ :guilabel:`Remote hostname` field as shown in
+ :numref:`Figure %s <zfs_create_repl1_fig>`.
+ A hostname can be entered here if local DNS resolves for that
+ hostname.
 
-Click the :guilabel:`SSH Key Scan` button to retrieve the
-SSH host keys from *Beta* and fill the :guilabel:`Remote hostkey`
-field. Finally, click :guilabel:`OK` to create the replication task.
-After each periodic snapshot is created, a replication task will copy
-it to the destination system. See :ref:`Limiting Replication Times`
-for information about restricting when replication is allowed to run.
+ Click the :guilabel:`SSH Key Scan` button to retrieve the
+ SSH host keys from *Beta* and fill the :guilabel:`Remote hostkey`
+ field. Finally, click :guilabel:`OK` to create the replication task.
+ After each periodic snapshot is created, a replication task will copy
+ it to the destination system. See :ref:`Limiting Replication Times`
+ for information about restricting when replication is allowed to run.
 
 
 .. _zfs_create_repl1_fig:
